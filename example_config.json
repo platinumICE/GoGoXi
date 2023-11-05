@@ -1,0 +1,15 @@
+[{
+    "Component": "af.poq.sappoq",
+    "Hostname": "https://poq.local.network:50001",
+    "Password": "EgiEdPVD1tuvMf40Yvne",
+    "Period": "MONTHLY",
+    "Username": "USERNAME",
+    "UseCompression": true
+},{
+    "Component": "af.paq.sappoq",
+    "Hostname": "https://poq.local.network:50001",
+    "Password": "UcIv9eHBcTG1fx377HTO",
+    "Period": "MONTHLY",
+    "Username": "USERNAME",
+    "UseCompression": true
+}]
