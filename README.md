@@ -70,3 +70,203 @@ If compression is enabled, filenames will be \*.txt.gz
 	        Print verbose messages during processing
 
 Tool will prevent accidental output file overwrite. This allows for continuation if one config entry fails (for example, in case of incorrect or expired password).
+
+## File format (ximessage)
+
+File format is newline-delimited JSON. Each line represents one XI message in following structure (example):
+
+
+	{
+	    "ximessage": {
+	        "cancelable": false,
+	        "connectionName": "SOAP_http://sap.com/xi/XI/System",
+	        "direction": "OUTBOUND",
+	        "editable": false,
+	        "endTime": "2023-11-08T11:09:13.377+03:00",
+	        "endpoint": "<local>",
+	        "headers": {
+	            "original": "content-length=5450\nhttp=POST\ncontent-type=multipart/related; boundary=SAP_11271d92-7e0e-11ee-9105-00000c9d89ea_END; type=\"text/xml\"; start=\"<soap-E1F49308B5D91EEE9FC1C22063DFC044@sap.com>\"\n",
+	            "contentLength": 5450
+	        },
+	        "interface": {
+	            "name": "PurchaseRequest_Out",
+	            "namespace": "urn:company:Purchase"
+	        },
+	        "isPersistent": true,
+	        "messageID": "e1f49308-b5d9-1eee-9fc1-c22063df6044",
+	        "messageKey": "e1f49308-b5d9-1eee-9fc1-c22063df6044\\OUTBOUND\\878415850\\EO\\0\\",
+	        "messageType": "Send",
+	        "nodeId": "878415850",
+	        "persistUntil": "2024-05-06T11:08:57.744+03:00",
+	        "protocol": "XI",
+	        "qualityOfService": "EO",
+	        "receiverName": "EXTERNAL_p",
+	        "receiverParty": {
+	            "agency": "http://sap.com/xi/XI",
+	            "name": "",
+	            "schema": "XIParty"
+	        },
+	        "referenceID": "",
+	        "restartable": false,
+	        "retries": 10,
+	        "retryInterval": 300,
+	        "scheduleTime": "2023-11-08T11:08:57.748+03:00",
+	        "senderName": "ERP_S4HANA_P",
+	        "senderParty": {
+	            "agency": "http://sap.com/xi/XI",
+	            "name": "",
+	            "schema": "XIParty"
+	        },
+	        "sequenceNumber": 0,
+	        "serializationContext": "",
+	        "serviceDefinition": "",
+	        "softwareComponent": "",
+	        "startTime": "2023-11-08T11:08:57.744+03:00",
+	        "status": "success",
+	        "timesFailed": 0,
+	        "transport": "Loopback",
+	        "version": "0",
+	        "wasEdited": false,
+	        "scenarioIdentifier": "dir://ICO/f10d5af248d83dbe9ac62b827e8e223a",
+	        "parentID": "",
+	        "duration": 15.633,
+	        "size": 5450,
+	        "messagePriority": 1,
+	        "rootID": "",
+	        "sequenceID": "",
+	        "passportTID": "e78c57187e0d11eeb07100000c9d89ea",
+	        "logLocations": [
+	            "Receiver JSON Request",
+	            "AM"
+	        ],
+	        "UDS": {
+	            "RequestNumber": [
+	                "0048588891"
+	            ]
+	        },
+	        "UDSKeys": [
+	            "RequestNumber"
+	        ]
+	    },
+	    "gogoxi": {
+	        "component": "af.pop.sappop",
+	        "extractedOn": "2023-11-08T12:02:25.7824767+03:00"
+	    }
+	}
+
+Full JSON structure is described in *export_format.go*. Notable remarks:
+
+1. "*ximessage.nodeId*" is String
+2. "*ximessage.duration*" is recalculated in seconds, originally in milliseconds
+3. "*ximessage.retryInterval*" is recalculated in seconds, originally in milliseconds
+4. "*ximessage.persistUntil*" is cleared when originally is equal to 1970-01-01
+5. "*ximessage.UDS*" lists user-defined search attributes as object with UDS attribute name as object key and array of values as object value. UDS attribute values are always represented as arrays even if contains only one value.
+6. "*ximessage.UDSKeys*" lists all available UDS attribute names as array
+
+
+
+## File format (auditlog)
+
+File format is newline-delimited JSON. Each line represents one auditlog entry in following structure (example):
+
+
+	{
+	    "ximessage": {
+	        "cancelable": false,
+	        "connectionName": "SOAP_http://sap.com/xi/XI/System",
+	        "direction": "OUTBOUND",
+	        "editable": false,
+	        "endTime": "2023-11-08T11:09:13.377+03:00",
+	        "endpoint": "<local>",
+	        "headers": {
+	            "original": "content-length=5450\nhttp=POST\ncontent-type=multipart/related; boundary=SAP_11271d92-7e0e-11ee-9105-00000c9d89ea_END; type=\"text/xml\"; start=\"<soap-E1F49308B5D91EEE9FC1C22063DFC044@sap.com>\"\n",
+	            "contentLength": 5450
+	        },
+	        "interface": {
+	            "name": "PurchaseRequest_Out",
+	            "namespace": "urn:company:Purchase"
+	        },
+	        "isPersistent": true,
+	        "messageID": "e1f49308-b5d9-1eee-9fc1-c22063df6044",
+	        "messageKey": "e1f49308-b5d9-1eee-9fc1-c22063df6044\\OUTBOUND\\878415850\\EO\\0\\",
+	        "messageType": "Send",
+	        "nodeId": "878415850",
+	        "persistUntil": "2024-05-06T11:08:57.744+03:00",
+	        "protocol": "XI",
+	        "qualityOfService": "EO",
+	        "receiverName": "EXTERNAL_p",
+	        "receiverParty": {
+	            "agency": "http://sap.com/xi/XI",
+	            "name": "",
+	            "schema": "XIParty"
+	        },
+	        "referenceID": "",
+	        "restartable": false,
+	        "retries": 10,
+	        "retryInterval": 300,
+	        "scheduleTime": "2023-11-08T11:08:57.748+03:00",
+	        "senderName": "ERP_S4HANA_P",
+	        "senderParty": {
+	            "agency": "http://sap.com/xi/XI",
+	            "name": "",
+	            "schema": "XIParty"
+	        },
+	        "sequenceNumber": 0,
+	        "serializationContext": "",
+	        "serviceDefinition": "",
+	        "softwareComponent": "",
+	        "startTime": "2023-11-08T11:08:57.744+03:00",
+	        "status": "success",
+	        "timesFailed": 0,
+	        "transport": "Loopback",
+	        "version": "0",
+	        "wasEdited": false,
+	        "scenarioIdentifier": "dir://ICO/f10d5af248d83dbe9ac62b827e8e223a",
+	        "parentID": "",
+	        "duration": 15.633,
+	        "size": 5450,
+	        "messagePriority": 1,
+	        "rootID": "",
+	        "sequenceID": "",
+	        "passportTID": "e78c57187e0d11eeb07100000c9d89ea",
+	        "logLocations": [
+	            "Receiver JSON Request",
+	            "AM"
+	        ],
+	        "UDS": {
+	            "RequestNumber": [
+	                "0048588891"
+	            ]
+	        },
+	        "UDSKeys": [
+	            "RequestNumber"
+	        ]
+	    },
+	    "auditlog": {
+	        "messageID": "e1f49308-b5d9-1eee-9fc1-c22063df6044",
+	        "timestamp": "2023-11-08T11:09:35.869+03:00",
+	        "status": "SUCCESS",
+	        "localizedText": "Message status set to DLNG",
+	        "textKey": "STATUS_SET_SUCCESS",
+	        "textKeyParams": {
+	            "0": "DLNG"
+	        }
+	    },
+	    "gogoxi": {
+	        "component": "af.pop.sappop",
+	        "extractedOn": "2023-11-08T12:02:25.7824767+03:00"
+	    }
+	}
+
+Full JSON structure is described in *export_format.go*. Notable remarks:
+
+1. "*ximessage*" object is identical to XI message export format so all the remarks listed for ximessage file format apply here
+2. "*gogoxi*" object is identical to XI message export format
+3. "*auditlog.messageID*" refers to XI message ID and is identical to "*ximessage.messageID*"
+4. "*auditlog.status*" is decoded from one letter code to full word
+- W -> WARNING
+- E -> ERROR
+- S -> SUCCESS
+5. "*auditlog.localizedText*", "*auditlog.textKey*", "*auditlog.textKeyParams*" are cut to 4096 characters unless "*-notrim*" runtime option is applied.
+6. "*auditlog.textCutFrom*" attribute shows sum of original length in characters of attributes "*auditlog.localizedText*", "*auditlog.textKey*", "*auditlog.textKeyParams*". If none of these attributes are modified (cut in length) then "*auditlog.textCutFrom*" is missing
+7. "*auditlog.textKey*" is cleared if it is equal to "*auditlog.localizedText*"
