@@ -7,7 +7,7 @@ This tool allows for extraction of XI messages and audit log entries from Adapte
 
 Tool should be compatible with SAP Netweaver 7.35 or older, tested with SAP Netweaver 7.50.
 
-Overall tool architecture and ELK usage scenario is describled on SAP Blogs (*link will be published later*).
+Overall tool architecture and ELK usage scenario is describled in [SAP Blogs article](https://blogs.sap.com/2023/11/25/gogoxi-home-grown-tool-for-sap-po-observability/).
 
 ## Configuration file format
 
