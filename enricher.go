@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"net/http"
@@ -46,7 +47,6 @@ func udsEnricher(conf ToolConfiguration, input <-chan SearchResults, fileWriter 
 			if err != nil {
 				panic(err)
 			}
-			defer resp.Body.Close()
 
 			switch resp.StatusCode {
 			case 200:
@@ -62,9 +62,13 @@ func udsEnricher(conf ToolConfiguration, input <-chan SearchResults, fileWriter 
 				os.Exit(3)
 			}
 
-			responseBytes, err := io.ReadAll(resp.Body)
+			var buf bytes.Buffer
+			_, _ = io.Copy(&buf, resp.Body)
+			resp.Body.Close()
+
 			searchResults := new(XIEnvelop)
-			err = xml.Unmarshal(responseBytes, &searchResults)
+			err = xml.Unmarshal(buf.Bytes(), &searchResults)
+			buf.Reset()
 
 			if err != nil {
 				fmt.Printf("Please verify that host [%s], username [%s] and password are correct\n", conf.Hostname, conf.Username)

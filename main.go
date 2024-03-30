@@ -73,8 +73,6 @@ func main() {
 		os.Exit(0)
 	}
 
-	go scheduleGC()
-
 	for _, conf := range configuration {
 		if strings.HasPrefix(conf.Component, "af.") {
 			runner_java(conf, overwritePreviousRun)
@@ -210,14 +208,5 @@ func generateFilename(typeName string, conf ToolConfiguration) (string, bool) {
 		return filename, false
 	} else {
 		return filename, true
-	}
-}
-
-func scheduleGC() {
-	// Schedule Garbage Collection
-	ticker := time.NewTicker(time.Minute)
-
-	for range ticker.C {
-		runtime.GC()
 	}
 }
