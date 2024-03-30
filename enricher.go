@@ -27,53 +27,63 @@ func udsEnricher(conf ToolConfiguration, input <-chan SearchResults, fileWriter 
 			continue
 		}
 
-		requestTemplate := fmt.Sprintf(`<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:urn="urn:AdapterMessageMonitoringVi">
-   <soapenv:Header/>
-   <soapenv:Body>
-      <urn:getUserDefinedSearchAttributes>
-         <urn:messageKey>%s</urn:messageKey>
-         <urn:archive>false</urn:archive>
-      </urn:getUserDefinedSearchAttributes>
-   </soapenv:Body>
-</soapenv:Envelope>`, message.AdapterFrameworkData.MessageKey)
+		if conf.SkipUDS == false {
 
-		req, err := http.NewRequest("POST", fmt.Sprintf("%s/AdapterMessageMonitoring/basic?style=document", conf.Hostname), strings.NewReader(requestTemplate))
-		req.SetBasicAuth(conf.Username, conf.Password)
-		req.Header.Set("Content-Type", "text/xml; charset=utf-8")
-		resp, err := client.Do(req)
-		if err != nil {
-			panic(err)
+			requestTemplate := fmt.Sprintf(`<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:urn="urn:AdapterMessageMonitoringVi">
+	   <soapenv:Header/>
+	   <soapenv:Body>
+	      <urn:getUserDefinedSearchAttributes>
+	         <urn:messageKey>%s</urn:messageKey>
+	         <urn:archive>false</urn:archive>
+	      </urn:getUserDefinedSearchAttributes>
+	   </soapenv:Body>
+	</soapenv:Envelope>`, message.AdapterFrameworkData.MessageKey)
+
+			req, err := http.NewRequest("POST", fmt.Sprintf("%s/AdapterMessageMonitoring/basic?style=document", conf.Hostname), strings.NewReader(requestTemplate))
+			req.SetBasicAuth(conf.Username, conf.Password)
+			req.Header.Set("Content-Type", "text/xml; charset=utf-8")
+			resp, err := client.Do(req)
+			if err != nil {
+				panic(err)
+			}
+			defer resp.Body.Close()
+
+			switch resp.StatusCode {
+			case 200:
+				// noop
+			case 401:
+				fmt.Printf("HTTP 401: incorrect password for user %s\n", conf.Username)
+				os.Exit(2)
+			case 403:
+				fmt.Printf("HTTP 403: incorrect password for user %s\n", conf.Username)
+				os.Exit(2)
+			default:
+				fmt.Printf("HTTP %s: cannot read overview for host %s\n", resp.Status, conf.Hostname)
+				os.Exit(3)
+			}
+
+			responseBytes, err := io.ReadAll(resp.Body)
+			searchResults := new(XIEnvelop)
+			err = xml.Unmarshal(responseBytes, &searchResults)
+
+			if err != nil {
+				fmt.Printf("Please verify that host [%s], username [%s] and password are correct\n", conf.Hostname, conf.Username)
+				fmt.Printf("HTTP call returned: %s\n", err.Error())
+				os.Exit(3)
+			}
+
+			export_xi_message := FormatXIMessageForExport(conf, message, searchResults.Body.GetUDSAttributesResponse.Response.BusinessAttributes)
+
+			audit <- export_xi_message
+			fileWriter <- export_xi_message
+
+		} else {
+			emptyUDS := new([]XIBusinessAttribute)
+			export_xi_message := FormatXIMessageForExport(conf, message, *emptyUDS)
+
+			audit <- export_xi_message
+			fileWriter <- export_xi_message
 		}
-		defer resp.Body.Close()
-
-		switch resp.StatusCode {
-		case 200:
-			// noop
-		case 401:
-			fmt.Printf("HTTP 401: incorrect password for user %s\n", conf.Username)
-			os.Exit(2)
-		case 403:
-			fmt.Printf("HTTP 403: incorrect password for user %s\n", conf.Username)
-			os.Exit(2)
-		default:
-			fmt.Printf("HTTP %s: cannot read overview for host %s\n", resp.Status, conf.Hostname)
-			os.Exit(3)
-		}
-
-		responseBytes, err := io.ReadAll(resp.Body)
-		searchResults := new(XIEnvelop)
-		err = xml.Unmarshal(responseBytes, &searchResults)
-
-		if err != nil {
-			fmt.Printf("Please verify that host [%s], username [%s] and password are correct\n", conf.Hostname, conf.Username)
-			fmt.Printf("HTTP call returned: %s\n", err.Error())
-			os.Exit(3)
-		}
-
-		export_xi_message := FormatXIMessageForExport(conf, message, searchResults.Body.GetUDSAttributesResponse.Response.BusinessAttributes)
-
-		audit <- export_xi_message
-		fileWriter <- export_xi_message
 
 	}
 }

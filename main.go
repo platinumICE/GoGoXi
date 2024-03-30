@@ -25,6 +25,7 @@ type ToolConfiguration struct {
 	OutputPath             string
 	MaxMessagesPerSearch   int
 	MaxAuditlinesPerSearch int
+	SkipUDS                bool
 	Queuesizes             struct {
 		MessageSearch      int
 		Auditlog           int

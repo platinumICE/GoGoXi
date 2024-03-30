@@ -35,6 +35,7 @@ Minimal configuration file is presented below:
 |	OutputPath             | string |  /gogoxi | Specifies target directory to output result files |
 |	MaxMessagesPerSearch   | int |  10000 | Maximum number of messages to search using AdapterMessageMonitoringVi service. No need to change in production runs. |
 |	MaxAuditlinesPerSearch | int |  10000 | Maximum number of audit messages to get using AdapterMessageMonitoringVi service per message ID. No need to change in production runs. |
+|	SkipUDS | bool |  false | User-Defined Search attributes will not be requested from SAP PO. This will skip 1 request per message. |
 |	Queuesizes / MessageSearch      | int | 500 | Internal buffer size. Stores overview lines for later search. |
 |	Queuesizes / UDSearchAttributes | int | 100000 | Internal buffer size. Stores messages to augment with User-Defined Search attributes. |
 |	Queuesizes / Auditlog           | int | 100000 | Internal buffer size. Stores messages to extract audit log entries. |
