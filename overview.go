@@ -31,7 +31,7 @@ type XIOverviewPeriods struct {
 type XIOverviewDetailsXML struct {
 	XMLName     xml.Name `xml:"MessageStatisticsQueryResults"`
 	PeriodEntry []struct {
-		Entry []string `xml: "Entry"`
+		Entry []string `xml:"Entry"`
 	} `xml:"Data>DataRows>Row"`
 }
 

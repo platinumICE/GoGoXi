@@ -8,6 +8,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"runtime"
 )
 
 import (
@@ -71,6 +72,8 @@ func main() {
 		printConfig(configuration)
 		os.Exit(0)
 	}
+
+	go scheduleGC()
 
 	for _, conf := range configuration {
 		if strings.HasPrefix(conf.Component, "af.") {
@@ -207,5 +210,14 @@ func generateFilename(typeName string, conf ToolConfiguration) (string, bool) {
 		return filename, false
 	} else {
 		return filename, true
+	}
+}
+
+func scheduleGC() {
+	// Schedule Garbage Collection
+	ticker := time.NewTicker(time.Minute)
+
+	for range ticker.C {
+		runtime.GC()
 	}
 }
